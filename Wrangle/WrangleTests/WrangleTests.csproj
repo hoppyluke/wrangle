@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Dictionary\FromPairsTests.cs" />
     <Compile Include="Dictionary\FromTests.cs" />
+    <Compile Include="Instance\FromTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

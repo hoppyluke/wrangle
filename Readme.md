@@ -17,3 +17,15 @@ var args3 = Wrangle.Dictionary.FromPairs(":", new[] {"apples:oranges", "pears:ba
 Debug.Assert(args3["apples"] == "oranges");
 Debug.Assert(args3["pears"] == "bananas");
 ```
+
+## To Object
+
+```csharp
+public class MyArgs
+{
+    public string Name { get; set; }
+}
+
+var args = Wrangle.Instance<MyArgs>.From(new[] {"Name", "Leonardo"});
+Debug.Assert(args.Name == "Leonardo");
+```

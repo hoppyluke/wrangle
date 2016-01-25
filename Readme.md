@@ -18,14 +18,30 @@ Debug.Assert(args3["apples"] == "oranges");
 Debug.Assert(args3["pears"] == "bananas");
 ```
 
-## To Object
+## To Object/Struct
 
 ```csharp
-public class MyArgs
+public class Orders
 {
-    public string Name { get; set; }
+    public int WarpFactor { get; set; }
+    public PhaserSetting Phasers { get; set; }
 }
 
-var args = Wrangle.Instance<MyArgs>.From(new[] {"Name", "Leonardo"});
-Debug.Assert(args.Name == "Leonardo");
+public enum PhaserSetting
+{
+    Stun,
+    Tickle
+}
+
+var orders = Wrangle.Instance<Orders>.From(new[] {"-WarpFactor", "5", "-Phasers", "Stun"});
+Debug.Assert(orders.WarpFactor == 5);
+Debug.Assert(orders.Phasers == PhaserSetting.Stun);
 ```
+Supports properties of these types:
+* any simple type: `bool`, `char`, `byte`, `sbyte`, `short`, `ushort`,
+  `int`, `uint`, `long`, `ulong`, `float`, `double`, `decimal`
+* `string`
+* `DateTime`, `TimeSpan`, `DateTimeOffset`, `Guid`
+* any `enum`
+
+Properties must have public `get` and `set` accessors.

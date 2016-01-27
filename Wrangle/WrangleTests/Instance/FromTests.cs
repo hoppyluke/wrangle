@@ -156,6 +156,18 @@ namespace WrangleTests.Instance
             Assert.That(args.Value, Is.EqualTo(MyLongEnumArgs.MyULongEnum.Two));
         }
 
+        [TestCase("/")]
+        [TestCase("-")]
+        public void ShouldDetectKnownPrefix(string prefix)
+        {
+            var a = new[] { prefix + "Name", "abc", prefix + "Value", "123" };
+            var args = Wrangle.Instance<MyIntArgs>.From(a);
+
+            Assert.That(args, Is.Not.Null);
+            Assert.That(args.Name, Is.EqualTo("abc"));
+            Assert.That(args.Value, Is.EqualTo(123));
+        }
+
         // TODO:
         // ShouldAutoDetectHyphenPrefix
         // ShouldAutoDetectSlashPrefix

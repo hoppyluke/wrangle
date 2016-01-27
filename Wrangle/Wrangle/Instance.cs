@@ -13,17 +13,21 @@ namespace Wrangle
             { typeof(Guid), s => Guid.Parse(s) }
         };
 
+        private static readonly string[] KnownPrefixes = { "-", "/" };
+
         public static T From(string[] args)
         {
             var arguments = new T();
 
             if (args == null || args.Length == 0) return arguments;
 
+            var prefix = KnownPrefixes.FirstOrDefault(p => args[0].StartsWith(p));
+
+            var d = Wrangle.Dictionary.From(args, prefix);
+
             var properties = typeof(T).GetProperties()
                 .Where(p => p.GetGetMethod() != null && p.GetSetMethod() != null);
-
-            var d = Wrangle.Dictionary.From(args);
-
+            
             foreach(var pair in d)
             {
                 var property = properties.Where(p => p.Name == pair.Key).Single();

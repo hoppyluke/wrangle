@@ -42,6 +42,6 @@ Supports properties of these types:
   `int`, `uint`, `long`, `ulong`, `float`, `double`, `decimal`
 * `string`
 * `DateTime`, `TimeSpan`, `DateTimeOffset`, `Guid`
-* any `enum`
+* any `enum`; you can use either the name or numeric value (but not combinations of bit flags)
 
 Properties must have public `get` and `set` accessors.

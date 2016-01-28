@@ -30,8 +30,14 @@ namespace Wrangle
             
             foreach(var pair in d)
             {
-                var property = properties.Where(p => p.Name == pair.Key).Single();
+                var property = properties.Where(p => p.Name == pair.Key)
+                    .FirstOrDefault();
                 
+                if(property == null)
+                {
+                    throw new ArgumentException($"Invalid argument name: " + pair.Key);
+                }
+
                 if(KnownConversions.ContainsKey(property.PropertyType))
                 {
                     property.SetValue(arguments, KnownConversions[property.PropertyType](pair.Value));

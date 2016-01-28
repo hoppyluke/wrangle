@@ -168,9 +168,15 @@ namespace WrangleTests.Instance
             Assert.That(args.Value, Is.EqualTo(123));
         }
 
+        [Test]
+        public void ShouldValidateArgumentNames()
+        {
+            var a = new[] { "Name", "name", "Foo", "bar" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
+        }
+        
         // TODO:
-        // ShouldAutoDetectHyphenPrefix
-        // ShouldAutoDetectSlashPrefix
         // ShouldValidatePropertyNames (throw argument exception if object has no property matching name
         // error handling e.g.:
         //    - attempt to assign string to int property

@@ -27,34 +27,57 @@ namespace Wrangle
 
             var properties = typeof(T).GetProperties()
                 .Where(p => p.GetGetMethod() != null && p.GetSetMethod() != null);
-            
-            foreach(var pair in d)
+
+            foreach (var pair in d)
             {
                 var property = properties.Where(p => p.Name == pair.Key)
                     .FirstOrDefault();
-                
-                if(property == null)
+
+                if (property == null)
                 {
-                    throw new ArgumentException($"Invalid argument name: " + pair.Key);
+                    throw new ArgumentException($"Unknown argument name: " + pair.Key);
                 }
 
-                if(KnownConversions.ContainsKey(property.PropertyType))
+                try
                 {
-                    property.SetValue(arguments, KnownConversions[property.PropertyType](pair.Value));
+                    if (KnownConversions.ContainsKey(property.PropertyType))
+                    {
+                        property.SetValue(arguments, KnownConversions[property.PropertyType](pair.Value));
+                    }
+                    else if (property.PropertyType.IsEnum)
+                    {
+                        if (!Enum.IsDefined(property.PropertyType, pair.Value))
+                            throw InvalidValue(pair.Key, pair.Value);
+
+                        var value = Enum.Parse(property.PropertyType, pair.Value, ignoreCase: true);
+                        property.SetValue(arguments, value);
+                    }
+                    else
+                    {
+                        var value = Convert.ChangeType(pair.Value, property.PropertyType);
+                        property.SetValue(arguments, value);
+                    }
                 }
-                else if(property.PropertyType.IsEnum)
+                catch (FormatException e)
                 {
-                    var value = Enum.Parse(property.PropertyType, pair.Value, ignoreCase: true);
-                    property.SetValue(arguments, value);   
+                    throw InvalidValue(pair.Key, pair.Value, e);
                 }
-                else
+                catch (OverflowException e)
                 {
-                    var value = Convert.ChangeType(pair.Value, property.PropertyType);
-                    property.SetValue(arguments, value);
+                    throw InvalidValue(pair.Key, pair.Value, e);
+                }
+                catch(InvalidCastException e)
+                {
+                    throw InvalidValue(pair.Key, pair.Value, e);
                 }
             }
 
             return arguments;
+        }
+
+        private static ArgumentException InvalidValue(string argumentName, string value, Exception innerException = null)
+        {
+            return new ArgumentException($"Value \"{value}\" given for argument {argumentName} is invalid", innerException);
         }
     }
 }

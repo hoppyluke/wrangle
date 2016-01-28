@@ -175,9 +175,84 @@ namespace WrangleTests.Instance
 
             Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
         }
+
+        [Test]
+        public void ShouldThrowForInvalidNumericArgument()
+        {
+            var a = new[] { "Name", "name", "Value", "foobar" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
+        }
         
+        [Test]
+        public void ShouldThrowForOverflow()
+        {
+            var bigNumber = 1L + int.MaxValue;
+            var a = new[] { "Name", "name", "Value", bigNumber.ToString() };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForUnderflow()
+        {
+            var smallNumber = -1L + int.MinValue;
+            var a = new[] { "Name", "name", "Value", smallNumber.ToString() };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForSettingRealNumberToInteger()
+        {
+            var a = new[] { "Name", "name", "Value", "123.456" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyIntArgs>.From(a));
+        }
+
+        [TestCase("foo", "05:00", "2016-01-28 20:49:00 +00:00")]
+        [TestCase("2016-01-28 20:49:00", "foo", "2016-01-28 20:49:00 +00:00")]
+        [TestCase("2016-01-28 20:49:00", "05:00", "foo")]
+        public void ShouldThrowForInvalidDateTimeArguments(string timestamp, string period, string offset)
+        {
+            var a = new[] { "TimeStamp", timestamp, "Period", period, "Offset", offset };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyDateArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForInvalidGuid()
+        {
+            var a = new[] { "Id", "zz39ec98-41e1-49bf-8ff8-8b2c2035a475" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyGuidArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForInvalidPropertyType()
+        {
+            var a = new[] { "Inner", "foo" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyImpossibleArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForOutOfRangeEnumValue()
+        {
+            var a = new[] { "Value", "1000" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyEnumArgs>.From(a));
+        }
+
+        [Test]
+        public void ShouldThrowForInvalidEnumString()
+        {
+            var a = new[] { "Value", "Five" };
+
+            Assert.Throws<ArgumentException>(() => Wrangle.Instance<MyEnumArgs>.From(a));
+        }
+
         // TODO:
-        // ShouldValidatePropertyNames (throw argument exception if object has no property matching name
         // error handling e.g.:
         //    - attempt to assign string to int property
         //    - invalid enum name
@@ -279,6 +354,13 @@ namespace WrangleTests.Instance
             }
 
             public MyULongEnum Value { get; set; }
+        }
+
+        private class MyImpossibleArgs
+        {
+            public class InnerClass { }
+            
+            public InnerClass Inner { get; set; }
         }
     }
 }
